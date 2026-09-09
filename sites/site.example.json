@@ -1,0 +1,60 @@
+{
+  "name": "example",
+  "baseUrl": "https://example.com",
+  "budgetUsdPerMonth": 100,
+  "headers": {
+    "x-example-synthetic": "1"
+  },
+  "alerts": {
+    "snsTopicName": "example-alerts",
+    "region": "us-east-1"
+  },
+  "quota": {
+    "table": "example-quota",
+    "region": "us-east-1",
+    "dailyCeiling": 400,
+    "monthlyCeiling": 12000,
+    "composeCostUsd": 0.008,
+    "aiMonthlyUsd": 96,
+    "profile": "dogchase"
+  },
+  "checks": [
+    {
+      "id": "home",
+      "path": "/",
+      "expect": {
+        "status": 200,
+        "bodyIncludes": "Example",
+        "headersPresent": ["strict-transport-security", "x-content-type-options"],
+        "maxLatencyMs": 4000
+      }
+    },
+    {
+      "id": "api-health",
+      "path": "/api/health",
+      "expect": { "status": 200, "maxLatencyMs": 2000 }
+    },
+    {
+      "id": "screening-live",
+      "method": "POST",
+      "path": "/api/thing",
+      "body": { "text": "http://spam.example/definitely-a-link" },
+      "expect": { "status": 422 }
+    },
+    {
+      "id": "size-cap-live",
+      "method": "POST",
+      "path": "/api/thing",
+      "bodyRepeat": { "text": "x", "count": 200000 },
+      "expect": { "status": 413 }
+    },
+    {
+      "id": "end-to-end-paid",
+      "method": "POST",
+      "path": "/api/generate",
+      "body": { "prompt": "daily smoke check" },
+      "spendsMoney": true,
+      "expect": { "status": 200, "maxLatencyMs": 15000 }
+    }
+  ]
+}

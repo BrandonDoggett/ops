@@ -1,0 +1,67 @@
+name: CI
+
+# Lightweight on purpose (cardjoon ADR-0004): this repository is small, has no
+# build step, and its tests are pure functions. Runtime is a few seconds.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm install
+      - run: npm test
+
+  dependency-free:
+    name: Smoke path runs from a bare checkout
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      # ADR-0001: the smoke path must import nothing outside node:, so it works
+      # with no install and a broken lockfile in a product cannot blind that
+      # product's own monitor. Assert the property rather than trusting it.
+      - name: Reject imports outside node: in the smoke path
+        run: |
+          bad=$(grep -hE '^import .* from "' \
+                  run.mjs lib/checks.mjs lib/report.mjs lib/sites.mjs \
+                | grep -vE 'from "(node:|\./)' || true)
+          if [ -n "$bad" ]; then
+            echo "::error::smoke path imports something outside node: - see docs/adr/0001"
+            echo "$bad"
+            exit 1
+          fi
+          echo "smoke path is clean"
+
+      # No npm install above this line, deliberately. sites/ holds only
+      # site.example.json, which the runner ignores, so the expected outcome is
+      # the "no site configs found" exit code - which still proves it ran.
+      - name: Execute with no install at all
+        run: |
+          set +e
+          node run.mjs --sites sites --format text
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "::error::expected exit 2 (no configs), got $code"
+            exit 1
+          fi
+          echo "runner executed from a bare checkout"

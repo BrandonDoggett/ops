@@ -1,0 +1,55 @@
+{
+  "name": "@eldoggo/ops",
+  "version": "1.0.0",
+  "description": "Site-agnostic smoke runner, live status, and kill switch. A site is a JSON file.",
+  "type": "module",
+  "private": true,
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BrandonDoggett/ops.git"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "ops-smoke": "run.mjs",
+    "ops-status": "status.mjs",
+    "ops-switch": "switch.mjs"
+  },
+  "exports": {
+    "./checks": "./lib/checks.mjs",
+    "./report": "./lib/report.mjs",
+    "./sites": "./lib/sites.mjs"
+  },
+  "files": [
+    "run.mjs",
+    "status.mjs",
+    "switch.mjs",
+    "lib/",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verify": "npm test",
+    "smoke": "node run.mjs"
+  },
+  "peerDependencies": {
+    "@aws-sdk/client-dynamodb": "^3",
+    "@aws-sdk/lib-dynamodb": "^3"
+  },
+  "peerDependenciesMeta": {
+    "@aws-sdk/client-dynamodb": {
+      "optional": true
+    },
+    "@aws-sdk/lib-dynamodb": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1129.0",
+    "@aws-sdk/lib-dynamodb": "^3.1129.0",
+    "vitest": "^4.1.9"
+  }
+}
