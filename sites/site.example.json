@@ -16,7 +16,7 @@
     "monthlyCeiling": 12000,
     "composeCostUsd": 0.008,
     "aiMonthlyUsd": 96,
-    "profile": "dogchase"
+    "profile": "default"
   },
   "checks": [
     {

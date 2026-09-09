@@ -103,7 +103,7 @@ seconds too many, cut the function off at the platform instead:
 
 ```bash
 aws lambda put-function-concurrency --function-name <fn> \
-  --reserved-concurrent-executions 0 --profile dogchase --region us-east-1
+  --reserved-concurrent-executions 0 --profile <profile> --region us-east-1
 # restore with: aws lambda delete-function-concurrency --function-name <fn> ...
 ```
 

@@ -38,7 +38,10 @@ function publishAlert(site, text) {
   const topic = site.alerts?.snsTopicName;
   if (!topic) return;
   const region = site.alerts?.region ?? "us-east-1";
-  const profile = process.env.AWS_PROFILE ?? "dogchase";
+  // No house default: take it from the site config, which is where property-
+  // specific facts belong (docs/adr/0001).
+  const profile =
+    process.env.AWS_PROFILE ?? site.alerts?.profile ?? site.quota?.profile ?? "default";
   try {
     const arn = execFileSync(
       "aws",
